@@ -425,6 +425,20 @@ button:disabled {
   color: #9ed2aa;
 }
 
+.forgot-password-button {
+  border: none;
+  background: transparent;
+  color: #a98549;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.forgot-password-button:hover {
+  color: #c9a96e;
+  text-decoration: underline;
+}
+
 @media (max-width: 850px) {
   .premium-page {
     padding: 20px;

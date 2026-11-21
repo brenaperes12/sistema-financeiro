@@ -8,44 +8,55 @@ function App() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [user, setUser] = useState(null)
 
-  // Verificar sessão e acompanhar autenticação
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setUser(data.session?.user ?? null)
-    })
+  const isRecovery = mode === 'recovery'
+  const isForgot = mode === 'forgot'
 
+  // Acompanhar a autenticação do Supabase
+  useEffect(() => {
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setUser(null)
+        setMode('recovery')
+        setMessage('Digite sua nova senha para recuperar o acesso.')
+        setError('')
+        return
+      }
+
       setUser(session?.user ?? null)
     })
 
     return () => subscription.unsubscribe()
   }, [])
 
-  // Alternar entre login e cadastro
+  // Alternar entre os formulários
   function changeMode(newMode) {
     setMode(newMode)
     setMessage('')
     setError('')
     setPassword('')
+    setConfirmPassword('')
+    setShowPassword(false)
   }
 
-  // Login e cadastro
+  // Login, cadastro e recuperação de senha
   async function handleSubmit(event) {
     event.preventDefault()
 
     setError('')
     setMessage('')
 
-    if (!email.trim() || !password) {
-      setError('Preencha o e-mail e a senha.')
+    // No modo de recuperação, o e-mail não é necessário.
+    if (mode !== 'recovery' && !email.trim()) {
+      setError('Informe seu e-mail.')
       return
     }
 
@@ -54,8 +65,43 @@ function App() {
       return
     }
 
+    if (mode === 'forgot') {
+      setLoading(true)
+
+      try {
+        const { error } = await supabase.auth.resetPasswordForEmail(
+          email.trim(),
+          {
+            redirectTo: window.location.origin,
+          }
+        )
+
+        if (error) throw error
+
+        setMessage(
+          'Se o e-mail estiver cadastrado, você receberá um link para redefinir sua senha. Verifique também a caixa de spam.'
+        )
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+
+      return
+    }
+
+    if (!password) {
+      setError('Informe sua senha.')
+      return
+    }
+
     if (password.length < 6) {
       setError('A senha deve ter pelo menos 6 caracteres.')
+      return
+    }
+
+    if (isRecovery && password !== confirmPassword) {
+      setError('As senhas não coincidem.')
       return
     }
 
@@ -67,8 +113,6 @@ function App() {
           email: email.trim(),
           password,
           options: {
-            // Redireciona para o endereço atual do Finance Gold.
-            // Na produção, será o domínio da Vercel.
             emailRedirectTo: window.location.origin,
             data: {
               name: name.trim(),
@@ -79,17 +123,29 @@ function App() {
         if (error) throw error
 
         if (data.session) {
-          setMessage(
-            'Conta criada com sucesso! Você já pode acessar o sistema.'
-          )
+          setMessage('Conta criada com sucesso! Você já pode acessar o sistema.')
         } else {
           setMessage(
             'Cadastro realizado! Confira seu e-mail e clique no link de confirmação para ativar sua conta.'
           )
-
           setMode('login')
           setPassword('')
         }
+      } else if (isRecovery) {
+        const { error } = await supabase.auth.updateUser({
+          password,
+        })
+
+        if (error) throw error
+
+        await supabase.auth.signOut()
+
+        setPassword('')
+        setConfirmPassword('')
+        setMode('login')
+        setMessage(
+          'Senha redefinida com sucesso! Agora entre com sua nova senha.'
+        )
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email: email.trim(),
@@ -115,9 +171,15 @@ function App() {
     }
   }
 
+  // Enviar link para recuperação de senha
+  function handleForgotPassword() {
+    changeMode('forgot')
+  }
+
   // Encerrar sessão
   async function handleLogout() {
     setLoading(true)
+    setError('')
 
     const { error } = await supabase.auth.signOut()
 
@@ -126,6 +188,7 @@ function App() {
     } else {
       setMessage('Você saiu da sua conta.')
       setPassword('')
+      setMode('login')
     }
 
     setLoading(false)
@@ -133,15 +196,26 @@ function App() {
 
   // Se existir usuário autenticado, mostrar Dashboard
   if (user) {
-    return (
-      <Dashboard
-        user={user}
-        onLogout={handleLogout}
-      />
-    )
+    return <Dashboard user={user} onLogout={handleLogout} />
   }
 
-  // Página de login e cadastro
+  // Títulos e descrições conforme o formulário
+  const heading = isRecovery
+    ? 'Crie uma nova senha.'
+    : isForgot
+      ? 'Recuperar acesso.'
+      : mode === 'login'
+        ? 'Bem-vindo de volta.'
+        : 'Crie sua conta.'
+
+  const description = isRecovery
+    ? 'Escolha uma nova senha para acessar sua conta.'
+    : isForgot
+      ? 'Informe seu e-mail para receber o link de recuperação.'
+      : mode === 'login'
+        ? 'Entre para acessar seu controle financeiro.'
+        : 'Comece a organizar sua vida financeira.'
+
   return (
     <main className="premium-page">
       <div className="login-layout">
@@ -212,40 +286,34 @@ function App() {
                 ÁREA DO CLIENTE
               </span>
 
-              <h2>
-                {mode === 'login'
-                  ? 'Bem-vindo de volta.'
-                  : 'Crie sua conta.'}
-              </h2>
+              <h2>{heading}</h2>
 
-              <p>
-                {mode === 'login'
-                  ? 'Entre para acessar seu controle financeiro.'
-                  : 'Comece a organizar sua vida financeira.'}
-              </p>
+              <p>{description}</p>
 
             </div>
 
             {/* ABAS */}
-            <div className="form-tabs">
+            {!isRecovery && !isForgot && (
+              <div className="form-tabs">
 
-              <button
-                type="button"
-                className={mode === 'login' ? 'active' : ''}
-                onClick={() => changeMode('login')}
-              >
-                Entrar
-              </button>
+                <button
+                  type="button"
+                  className={mode === 'login' ? 'active' : ''}
+                  onClick={() => changeMode('login')}
+                >
+                  Entrar
+                </button>
 
-              <button
-                type="button"
-                className={mode === 'register' ? 'active' : ''}
-                onClick={() => changeMode('register')}
-              >
-                Criar conta
-              </button>
+                <button
+                  type="button"
+                  className={mode === 'register' ? 'active' : ''}
+                  onClick={() => changeMode('register')}
+                >
+                  Criar conta
+                </button>
 
-            </div>
+              </div>
+            )}
 
             {/* FORMULÁRIO */}
             <form onSubmit={handleSubmit}>
@@ -277,82 +345,131 @@ function App() {
               )}
 
               {/* E-MAIL */}
-              <div className="field-group">
+              {!isRecovery && (
+                <div className="field-group">
 
-                <label htmlFor="email">
-                  E-mail
-                </label>
+                  <label htmlFor="email">
+                    E-mail
+                  </label>
 
-                <div className="input-wrapper">
+                  <div className="input-wrapper">
 
-                  <i className="bi bi-envelope"></i>
+                    <i className="bi bi-envelope"></i>
 
-                  <input
-                    id="email"
-                    type="email"
-                    placeholder="seuemail@exemplo.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    autoComplete="email"
-                    required
-                  />
+                    <input
+                      id="email"
+                      type="email"
+                      placeholder="seuemail@exemplo.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      autoComplete="email"
+                      required
+                    />
 
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* SENHA */}
-              <div className="field-group">
+              {!isForgot && (
+                <div className="field-group">
 
-                <label htmlFor="password">
-                  Senha
-                </label>
+                  <label htmlFor="password">
+                    {isRecovery ? 'Nova senha' : 'Senha'}
+                  </label>
 
-                <div className="input-wrapper">
+                  <div className="input-wrapper">
 
-                  <i className="bi bi-lock"></i>
+                    <i className="bi bi-lock"></i>
 
-                  <input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Digite sua senha"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    autoComplete={
-                      mode === 'login'
-                        ? 'current-password'
-                        : 'new-password'
-                    }
-                    minLength={6}
-                    required
-                  />
+                    <input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder={
+                        isRecovery
+                          ? 'Digite sua nova senha'
+                          : 'Digite sua senha'
+                      }
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      autoComplete={
+                        mode === 'login'
+                          ? 'current-password'
+                          : 'new-password'
+                      }
+                      minLength={6}
+                      required
+                    />
 
-                  <button
-                    type="button"
-                    className="password-toggle"
-                    onClick={() => setShowPassword(!showPassword)}
-                    aria-label={
-                      showPassword
-                        ? 'Ocultar senha'
-                        : 'Mostrar senha'
-                    }
-                  >
-                    <i
-                      className={`bi ${
+                    <button
+                      type="button"
+                      className="password-toggle"
+                      onClick={() => setShowPassword(!showPassword)}
+                      aria-label={
                         showPassword
-                          ? 'bi-eye-slash'
-                          : 'bi-eye'
-                      }`}
-                    ></i>
-                  </button>
+                          ? 'Ocultar senha'
+                          : 'Mostrar senha'
+                      }
+                    >
+                      <i
+                        className={`bi ${
+                          showPassword ? 'bi-eye-slash' : 'bi-eye'
+                        }`}
+                      ></i>
+                    </button>
 
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {/* CONFIRMAR NOVA SENHA */}
+              {isRecovery && (
+                <div className="field-group">
+
+                  <label htmlFor="confirmPassword">
+                    Confirmar nova senha
+                  </label>
+
+                  <div className="input-wrapper">
+
+                    <i className="bi bi-lock-fill"></i>
+
+                    <input
+                      id="confirmPassword"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Digite novamente sua nova senha"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      autoComplete="new-password"
+                      minLength={6}
+                      required
+                    />
+
+                  </div>
+                </div>
+              )}
 
               {/* PROTEÇÃO DE ACESSO */}
               {mode === 'login' && (
                 <div className="form-options">
+
                   <span>Proteção de acesso</span>
+
                   <i className="bi bi-shield-lock"></i>
+
+                </div>
+              )}
+
+              {/* ESQUECI MINHA SENHA */}
+              {mode === 'login' && (
+                <div className="forgot-password-container">
+                  <button
+                    type="button"
+                    className="forgot-password-button"
+                    onClick={handleForgotPassword}
+                  >
+                    Esqueci minha senha
+                  </button>
                 </div>
               )}
 
@@ -386,9 +503,13 @@ function App() {
               >
                 {loading
                   ? 'Aguarde...'
-                  : mode === 'login'
-                    ? 'Entrar na minha conta'
-                    : 'Criar minha conta'}
+                  : isRecovery
+                    ? 'Redefinir minha senha'
+                    : isForgot
+                      ? 'Enviar link de recuperação'
+                      : mode === 'login'
+                        ? 'Entrar na minha conta'
+                        : 'Criar minha conta'}
 
                 {!loading && (
                   <i className="bi bi-arrow-right"></i>
@@ -398,13 +519,31 @@ function App() {
 
             </form>
 
-            <div className="form-bottom">
+            {/* VOLTAR PARA LOGIN */}
+            {(isForgot || isRecovery) && (
+              <div className="form-bottom">
 
-              <i className="bi bi-shield-lock"></i>
+                <button
+                  type="button"
+                  className="forgot-password-button"
+                  onClick={() => changeMode('login')}
+                >
+                  <i className="bi bi-arrow-left"></i>
+                  {' '}Voltar para login
+                </button>
 
-              Seus dados são protegidos e armazenados com segurança.
+              </div>
+            )}
 
-            </div>
+            {!isForgot && !isRecovery && (
+              <div className="form-bottom">
+
+                <i className="bi bi-shield-lock"></i>
+
+                Seus dados são protegidos e armazenados com segurança.
+
+              </div>
+            )}
 
           </div>
 
