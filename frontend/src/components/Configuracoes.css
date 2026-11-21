@@ -1,0 +1,172 @@
+
+.configuracoes-page {
+  max-width: 1500px;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 100px);
+  box-sizing: border-box;
+}
+
+.configuracoes-panel {
+  margin-bottom: 18px;
+}
+
+.configuracoes-panel .panel-heading {
+  margin-bottom: 22px;
+}
+
+.configuracoes-panel-icon {
+  color: #c2a46d;
+  font-size: 21px;
+}
+
+.configuracoes-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  max-width: 900px;
+}
+
+.configuracoes-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.configuracoes-field label {
+  color: #d8d0c2;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.configuracoes-field input {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid #40372a;
+  border-radius: 7px;
+  outline: none;
+  background: #151412;
+  color: #eee7db;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color-scheme: dark;
+}
+
+.configuracoes-field input:focus {
+  border-color: #a88a57;
+  box-shadow: 0 0 0 2px rgba(168, 138, 87, 0.12);
+}
+
+.configuracoes-field input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.configuracoes-hint,
+.configuracoes-description {
+  color: #918c82;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.configuracoes-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: fit-content;
+  min-width: 130px;
+  min-height: 40px;
+  margin-top: 5px;
+  cursor: pointer;
+}
+
+.configuracoes-action:disabled,
+.configuracoes-delete-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.configuracoes-success {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border: 1px solid #3b5942;
+  border-radius: 7px;
+  background: #1e2b21;
+  color: #88c99c;
+  font-size: 11px;
+}
+
+.configuracoes-feedback {
+  margin-bottom: 16px;
+}
+
+.configuracoes-description {
+  max-width: 850px;
+  margin: -5px 0 16px;
+}
+
+.configuracoes-danger {
+  border-color: #70453d;
+}
+
+.configuracoes-danger-icon {
+  color: #df9385;
+  font-size: 21px;
+}
+
+.configuracoes-delete-button {
+  min-height: 40px;
+  margin-top: 14px;
+  padding: 10px 16px;
+  border: 1px solid #9c5c4e;
+  border-radius: 7px;
+  background: #3c2926;
+  color: #df9385;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.configuracoes-delete-button:hover:not(:disabled) {
+  background: #4a302b;
+}
+
+/* Rodapé */
+.configuracoes-page .dashboard-footer {
+  width: 100%;
+  margin-top: auto;
+  padding: 30px 10px 12px;
+  color: #777064;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+@media (max-width: 700px) {
+  .configuracoes-page {
+    min-height: calc(100vh - 100px);
+  }
+
+  .configuracoes-form {
+    grid-template-columns: 1fr;
+  }
+
+  .configuracoes-action {
+    width: 100%;
+  }
+
+  .configuracoes-page .dashboard-footer {
+    padding-top: 25px;
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+}

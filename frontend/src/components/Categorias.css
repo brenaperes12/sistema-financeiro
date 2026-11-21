@@ -1,0 +1,269 @@
+
+/* Estrutura da página e posicionamento do rodapé */
+.categories-page {
+  min-height: calc(100vh - 100px);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.categories-page .dashboard-footer {
+  margin-top: auto;
+  padding-top: 28px;
+  text-align: center;
+}
+
+/* Grade principal */
+.categories-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1.4fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.category-form-panel,
+.category-list-panel {
+  min-width: 0;
+}
+
+.category-heading-icon,
+.category-count {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #3a3021;
+  color: #d5b477;
+  font-size: 17px;
+}
+
+.category-count {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.category-field {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 20px;
+}
+
+.category-field label {
+  color: #d8d0c2;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.category-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 46px;
+  padding: 0 13px;
+  border: 1px solid #494033;
+  border-radius: 7px;
+  background: #171613;
+  color: #c3a36d;
+}
+
+.category-input-wrapper:focus-within {
+  border-color: #b99b63;
+}
+
+.category-input-wrapper input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #f2ede4;
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.category-input-wrapper input::placeholder {
+  color: #777064;
+}
+
+.category-submit,
+.category-cancel {
+  width: 100%;
+  min-height: 43px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1px solid #b99b63;
+  border-radius: 7px;
+  background: linear-gradient(100deg, #a98951, #d2b47c);
+  color: #17130d;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.category-submit:hover {
+  filter: brightness(1.1);
+}
+
+.category-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.category-cancel {
+  margin-top: 10px;
+  border-color: #514638;
+  background: transparent;
+  color: #c9bda9;
+}
+
+.category-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 68px;
+  border-bottom: 1px solid #34312a;
+}
+
+.category-item:last-child {
+  border-bottom: 0;
+}
+
+.category-item-icon {
+  width: 37px;
+  height: 37px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #30291e;
+  color: #d0ae70;
+}
+
+.category-item-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.category-item-info strong {
+  overflow: hidden;
+  color: #e9e2d6;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.category-item-info span {
+  color: #898176;
+  font-size: 9px;
+}
+
+.category-actions {
+  display: flex;
+  gap: 7px;
+}
+
+.category-actions button {
+  width: 33px;
+  height: 33px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #494033;
+  border-radius: 6px;
+  background: transparent;
+  color: #c7ac7a;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.category-actions button:hover {
+  border-color: #b99b63;
+  background: #30291e;
+}
+
+.category-actions .category-delete {
+  color: #d58d80;
+}
+
+.category-actions .category-delete:hover {
+  border-color: #a65d51;
+  background: #382522;
+}
+
+.category-empty {
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #928a7e;
+  font-size: 11px;
+  text-align: center;
+}
+
+.category-empty i {
+  color: #bd9c64;
+  font-size: 28px;
+}
+
+.category-empty strong {
+  color: #e2dbce;
+  font-size: 12px;
+}
+
+.categories-feedback {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding: 13px 15px;
+  border-radius: 7px;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.categories-error {
+  border: 1px solid #78453f;
+  background: #33201e;
+  color: #e5a39a;
+}
+
+.categories-success {
+  border: 1px solid #315d40;
+  background: #1c3024;
+  color: #91cba0;
+}
+
+/* Telas menores */
+@media (max-width: 1000px) {
+  .categories-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 550px) {
+  .category-form-panel,
+  .category-list-panel {
+    padding: 17px;
+  }
+
+  .category-item {
+    gap: 8px;
+  }
+
+  .category-actions {
+    gap: 4px;
+  }
+}

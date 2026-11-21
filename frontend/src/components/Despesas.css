@@ -1,0 +1,487 @@
+/* FINANCE GOLD — DESPESAS
+   Tipografia e paleta alinhadas ao Dashboard:
+   DM Sans para interface e Playfair Display para títulos.
+*/
+
+.despesas-page {
+  min-height: calc(100vh - 100px);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 34px 35px;
+  color: #f5f2eb;
+  font-family: 'DM Sans', sans-serif;
+  box-sizing: border-box;
+}
+
+.despesas-page *,
+.despesas-page *::before,
+.despesas-page *::after {
+  box-sizing: border-box;
+}
+
+.despesas-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 27px;
+}
+
+.despesas-eyebrow {
+  color: #ad956a;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.7px;
+}
+
+.despesas-heading h1 {
+  margin: 9px 0 6px;
+  color: #f1ece2;
+  font-family: 'Playfair Display', serif;
+  font-size: 27px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.despesas-heading p,
+.despesas-panel-heading p,
+.despesas-list-heading p {
+  margin: 0;
+  color: #918c82;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.despesas-heading-icon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #51432c;
+  border-radius: 9px;
+  background: #29251f;
+  color: #d0ae70;
+  font-size: 20px;
+}
+
+.despesas-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 17px;
+  margin-bottom: 21px;
+}
+
+.despesas-summary-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  min-height: 112px;
+  padding: 21px;
+  border: 1px solid #39342b;
+  border-radius: 10px;
+  background: linear-gradient(145deg, #24221e, #1d1c19);
+}
+
+.despesas-summary-icon {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #59462a;
+  color: #e2bd7b;
+  font-size: 17px;
+}
+
+.despesas-summary-card span {
+  display: block;
+  margin-bottom: 9px;
+  color: #aaa397;
+  font-size: 11px;
+}
+
+.despesas-summary-card strong {
+  display: block;
+  color: #f3eee5;
+  font-size: clamp(17px, 1.6vw, 22px);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.despesas-content-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.55fr);
+  align-items: start;
+  gap: 17px;
+}
+
+.despesas-panel {
+  min-width: 0;
+  padding: 23px;
+  border: 1px solid #39342b;
+  border-radius: 10px;
+  background: #1e1d1a;
+}
+
+.despesas-panel-heading,
+.despesas-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 24px;
+}
+
+.despesas-panel-heading h2,
+.despesas-list-heading h2 {
+  margin: 7px 0 5px;
+  color: #f0ece3;
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.despesas-panel-heading > i {
+  color: #c2a46d;
+  font-size: 20px;
+}
+
+.despesas-form {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.despesas-form label {
+  margin-top: 7px;
+  color: #d8d0c2;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.despesas-form input,
+.despesas-form select,
+.despesas-period-select {
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid #40372a;
+  border-radius: 7px;
+  outline: none;
+  background: #151412;
+  color: #eee7db;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color-scheme: dark;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.despesas-form input::placeholder {
+  color: #777166;
+}
+
+.despesas-form input:focus,
+.despesas-form select:focus,
+.despesas-period-select:focus {
+  border-color: #a88a57;
+  box-shadow: 0 0 0 2px rgba(168, 138, 87, 0.12);
+}
+
+.despesas-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.despesas-form-row > div {
+  min-width: 0;
+}
+
+.despesas-help {
+  margin: 3px 0;
+  color: #c5a873;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.despesas-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 12px;
+}
+
+.despesas-button {
+  min-height: 40px;
+  padding: 10px 16px;
+  border: 1px solid #b99b63;
+  border-radius: 7px;
+  background: #c2a46d;
+  color: #171512;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.despesas-button:hover:not(:disabled) {
+  border-color: #d0ae70;
+  background: #d0ae70;
+}
+
+.despesas-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.despesas-button-secondary {
+  border-color: #484031;
+  background: transparent;
+  color: #c7bca9;
+}
+
+.despesas-button-secondary:hover:not(:disabled) {
+  border-color: #a88a57;
+  background: #292721;
+  color: #e1bf80;
+}
+
+.despesas-alert {
+  margin-bottom: 13px;
+  padding: 10px 12px;
+  border-radius: 7px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.despesas-alert-error {
+  border: 1px solid #70453d;
+  background: #30211e;
+  color: #df9385;
+}
+
+.despesas-alert-success {
+  border: 1px solid #3b5942;
+  background: #1e2b21;
+  color: #88c99c;
+}
+
+.despesas-period-select {
+  width: auto;
+  min-width: 125px;
+  min-height: 36px;
+  padding: 7px 10px;
+  border-color: #484031;
+  color: #d3b77f;
+  font-size: 10px;
+}
+
+.despesas-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.despesas-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #eee7db;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.despesas-table th {
+  padding: 12px 10px;
+  border-bottom: 1px solid #39342b;
+  color: #a9a296;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.despesas-table td {
+  padding: 14px 10px;
+  border-bottom: 1px solid #302b23;
+  color: #e5dfd3;
+  font-size: 11px;
+}
+
+.despesas-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.despesas-category {
+  color: #d0ae70;
+}
+
+.despesas-value {
+  color: #df9385 !important;
+  font-weight: 700;
+}
+
+.despesas-row-actions {
+  display: flex;
+  gap: 7px;
+}
+
+.despesas-row-actions button {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #484031;
+  border-radius: 6px;
+  background: transparent;
+  color: #d0ae70;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.despesas-row-actions button:hover {
+  border-color: #a88a57;
+  background: #292721;
+}
+
+.despesas-row-actions button:last-child {
+  color: #df9385;
+}
+
+.despesas-row-actions button:last-child:hover {
+  border-color: #9c5c4e;
+  background: #30211e;
+}
+
+.despesas-empty {
+  min-height: 190px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  color: #918c82;
+  font-size: 11px;
+  text-align: center;
+}
+
+.despesas-empty i {
+  color: #c2a46d;
+  font-size: 27px;
+}
+
+.despesas-empty strong {
+  color: #f0ece3;
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.despesas-footer {
+  margin-top: auto;
+  padding-top: 28px;
+  color: #777064;
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 1.4px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+@media (max-width: 1100px) {
+  .despesas-page {
+    padding: 28px 24px;
+  }
+
+  .despesas-content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .despesas-page {
+    padding: 22px 15px;
+  }
+
+  .despesas-summary {
+    grid-template-columns: 1fr;
+    gap: 11px;
+  }
+
+  .despesas-summary-card {
+    min-height: 88px;
+    padding: 16px;
+  }
+
+  .despesas-panel {
+    padding: 17px;
+  }
+
+  .despesas-list-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .despesas-period-select {
+    width: 100%;
+  }
+
+  .despesas-form-row {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .despesas-table thead {
+    display: none;
+  }
+
+  .despesas-table,
+  .despesas-table tbody,
+  .despesas-table tr,
+  .despesas-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .despesas-table tr {
+    margin-bottom: 12px;
+    padding: 8px 11px;
+    border: 1px solid #39342b;
+    border-radius: 7px;
+    background: #1b1a17;
+  }
+
+  .despesas-table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 9px 0;
+    border-bottom: 1px solid #302b23;
+    text-align: right;
+    white-space: normal;
+  }
+
+  .despesas-table td::before {
+    content: attr(data-label);
+    color: #a9a296;
+    font-size: 10px;
+    text-align: left;
+  }
+
+  .despesas-table td:last-child {
+    border-bottom: 0;
+  }
+
+  .despesas-row-actions {
+    justify-content: flex-end;
+  }
+}
