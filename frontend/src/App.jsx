@@ -67,6 +67,9 @@ function App() {
           email: email.trim(),
           password,
           options: {
+            // Redireciona para o endereço atual do Finance Gold.
+            // Na produção, será o domínio da Vercel.
+            emailRedirectTo: window.location.origin,
             data: {
               name: name.trim(),
             },
@@ -81,7 +84,7 @@ function App() {
           )
         } else {
           setMessage(
-            'Cadastro realizado! Confira seu e-mail para confirmar a conta antes de entrar.'
+            'Cadastro realizado! Confira seu e-mail e clique no link de confirmação para ativar sua conta.'
           )
 
           setMode('login')
