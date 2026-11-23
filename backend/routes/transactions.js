@@ -1,13 +1,53 @@
 
 import express from 'express'
+
 import { supabaseAdmin } from '../config/supabase.js'
 import { authMiddleware } from '../middleware/auth.js'
+import {
+  encryptText,
+  decryptText,
+} from '../utils/encryption.js'
 
 const router = express.Router()
 
 router.use(authMiddleware)
 
 const validTypes = ['income', 'expense']
+
+// Converte os dados do banco para o formato utilizado pelo frontend.
+// Registros antigos são lidos pelas colunas originais.
+// Registros novos são descriptografados pelas colunas protegidas.
+function normalizeTransaction(transaction) {
+  const description = transaction.description_encrypted
+    ? decryptText(transaction.description_encrypted)
+    : transaction.description
+
+  const amountValue = transaction.amount_encrypted
+    ? decryptText(transaction.amount_encrypted)
+    : transaction.amount
+
+  const amount = Number(amountValue)
+
+  if (
+    typeof description !== 'string' ||
+    !description ||
+    !Number.isFinite(amount)
+  ) {
+    throw new Error('Não foi possível interpretar os dados da transação.')
+  }
+
+  const {
+    description_encrypted,
+    amount_encrypted,
+    ...otherFields
+  } = transaction
+
+  return {
+    ...otherFields,
+    description,
+    amount,
+  }
+}
 
 // LISTAR TRANSAÇÕES
 router.get('/', async (req, res) => {
@@ -22,6 +62,8 @@ router.get('/', async (req, res) => {
         category_id,
         description,
         amount,
+        description_encrypted,
+        amount_encrypted,
         type,
         transaction_date,
         created_at,
@@ -99,12 +141,14 @@ router.get('/', async (req, res) => {
       })
     }
 
+    const transactions = data.map(normalizeTransaction)
+
     return res.json({
       success: true,
-      transactions: data,
+      transactions,
     })
   } catch (error) {
-    console.error('Erro inesperado:', error.message)
+    console.error('Erro ao processar transações:', error.message)
 
     return res.status(500).json({
       success: false,
@@ -173,7 +217,9 @@ router.post('/', async (req, res) => {
       })
     }
 
-    const date = new Date(`${transaction_date}T00:00:00.000Z`)
+    const date = new Date(
+      `${transaction_date}T00:00:00.000Z`
+    )
 
     if (
       Number.isNaN(date.getTime()) ||
@@ -187,7 +233,11 @@ router.post('/', async (req, res) => {
 
     let validatedCategoryId = null
 
-    if (category_id !== null && category_id !== undefined && category_id !== '') {
+    if (
+      category_id !== null &&
+      category_id !== undefined &&
+      category_id !== ''
+    ) {
       validatedCategoryId = Number(category_id)
 
       if (
@@ -209,7 +259,10 @@ router.post('/', async (req, res) => {
           .maybeSingle()
 
       if (categoryError) {
-        console.error('Erro ao validar categoria:', categoryError.message)
+        console.error(
+          'Erro ao validar categoria:',
+          categoryError.message
+        )
 
         return res.status(500).json({
           success: false,
@@ -237,8 +290,15 @@ router.post('/', async (req, res) => {
       .insert({
         user_id: req.user.id,
         category_id: validatedCategoryId,
-        description: description.trim(),
-        amount: numericAmount,
+
+        // Os campos originais não recebem os dados em texto simples.
+        description: null,
+        amount: null,
+
+        // Novos dados são armazenados criptografados.
+        description_encrypted: encryptText(description.trim()),
+        amount_encrypted: encryptText(String(numericAmount)),
+
         type,
         transaction_date,
       })
@@ -248,6 +308,8 @@ router.post('/', async (req, res) => {
         category_id,
         description,
         amount,
+        description_encrypted,
+        amount_encrypted,
         type,
         transaction_date,
         created_at
@@ -266,10 +328,10 @@ router.post('/', async (req, res) => {
     return res.status(201).json({
       success: true,
       message: 'Transação cadastrada com sucesso!',
-      transaction: data,
+      transaction: normalizeTransaction(data),
     })
   } catch (error) {
-    console.error('Erro inesperado:', error.message)
+    console.error('Erro ao cadastrar transação:', error.message)
 
     return res.status(500).json({
       success: false,
@@ -341,7 +403,9 @@ router.put('/:id', async (req, res) => {
       })
     }
 
-    const date = new Date(`${transaction_date}T00:00:00.000Z`)
+    const date = new Date(
+      `${transaction_date}T00:00:00.000Z`
+    )
 
     if (
       Number.isNaN(date.getTime()) ||
@@ -355,7 +419,11 @@ router.put('/:id', async (req, res) => {
 
     let validatedCategoryId = null
 
-    if (category_id !== null && category_id !== undefined && category_id !== '') {
+    if (
+      category_id !== null &&
+      category_id !== undefined &&
+      category_id !== ''
+    ) {
       validatedCategoryId = Number(category_id)
 
       if (
@@ -377,7 +445,10 @@ router.put('/:id', async (req, res) => {
           .maybeSingle()
 
       if (categoryError) {
-        console.error('Erro ao validar categoria:', categoryError.message)
+        console.error(
+          'Erro ao validar categoria:',
+          categoryError.message
+        )
 
         return res.status(500).json({
           success: false,
@@ -404,8 +475,14 @@ router.put('/:id', async (req, res) => {
       .from('transactions')
       .update({
         category_id: validatedCategoryId,
-        description: description.trim(),
-        amount: numericAmount,
+
+        // Remove os valores em texto simples ao editar.
+        description: null,
+        amount: null,
+
+        description_encrypted: encryptText(description.trim()),
+        amount_encrypted: encryptText(String(numericAmount)),
+
         type,
         transaction_date,
       })
@@ -417,6 +494,8 @@ router.put('/:id', async (req, res) => {
         category_id,
         description,
         amount,
+        description_encrypted,
+        amount_encrypted,
         type,
         transaction_date,
         created_at
@@ -442,10 +521,10 @@ router.put('/:id', async (req, res) => {
     return res.json({
       success: true,
       message: 'Transação atualizada com sucesso!',
-      transaction: data,
+      transaction: normalizeTransaction(data),
     })
   } catch (error) {
-    console.error('Erro inesperado:', error.message)
+    console.error('Erro ao editar transação:', error.message)
 
     return res.status(500).json({
       success: false,
@@ -495,7 +574,7 @@ router.delete('/:id', async (req, res) => {
       message: 'Transação excluída com sucesso!',
     })
   } catch (error) {
-    console.error('Erro inesperado:', error.message)
+    console.error('Erro ao excluir transação:', error.message)
 
     return res.status(500).json({
       success: false,
