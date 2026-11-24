@@ -108,6 +108,11 @@ button:disabled {
   font-size: 23px;
 }
 
+.brand-symbol > .bi-gem {
+  position: relative;
+  left: 2px;
+}
+
 .brand-content {
   position: relative;
   z-index: 1;
